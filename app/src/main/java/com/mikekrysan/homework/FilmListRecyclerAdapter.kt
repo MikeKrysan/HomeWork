@@ -6,10 +6,14 @@ import android.widget.AdapterView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.film_item.view.*
 
+//В параметр передаем слушатель, чтобы мы потом могли обрабатывать нажатия из класса активити
 class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     //Здесь у нас хранится список элемнтов для RV
     private val items = mutableListOf<Film>()
+
+    //Этот метод нужно переопределить на возврат количества элементов в списке RV
+    override fun getItemCount() = items.size
 
     //В этом методе мы привязываем наш ViewHolder и передаем туда "надутую" верстку нашего фильма
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -33,9 +37,6 @@ class FilmListRecyclerAdapter(private val clickListener: OnItemClickListener) : 
             }
         }
     }
-
-    //Этот метод нужно переопределить на возврат количества элементов в списке RV
-    override fun getItemCount() = items.size
 
     //Метод для добавления объектов в наш список и ему нужно заново все "привязывать"
     fun addItems(list: List<Film>) {
