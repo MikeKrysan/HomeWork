@@ -55,7 +55,7 @@ class DetailsFragment : Fragment() {
     //24.16
     private fun setFilmDetails() {
         //24.15 Получаем наш фильм из переданного бандла
-        @Suppress("DEPRECATION") val film = arguments?.get("film") as Film
+         film = arguments?.get("film") as Film
         //Устанавливаем заголовки
         details_toolbar.title = film.title
         //Устанавливаем картинку

@@ -5,8 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_home.*
+import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -56,6 +58,36 @@ class HomeFragment : Fragment() {
         }
         //Кладем нашу БД в RV //24.10 End
         filmsAdapter.addItems(filmsDataBase)
+
+        //Для того, чтобы выбиралось все поле поиска при нажатии на нем, а не только по иконке:
+        search_view.setOnClickListener {
+            search_view.isIconified = false
+        }
+
+        //Подключаем слушателя изменений введенного текста в поиска
+        search_view.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+            //Этот метод отрабатывает на каждое изменения текста
+            override fun onQueryTextChange(newText: String?): Boolean {
+                //Если ввод пуст то вставляем в адаптер всю БД
+                    if (newText!!.isEmpty()) {
+                        filmsAdapter.addItems(filmsDataBase)
+                        return true
+                    }
+                //Фильтруем список на поискк подходящих сочетаний
+                val result = filmsDataBase.filter {
+                    //Чтобы все работало правильно, нужно и запрос, и имя фильма приводить к нижнему регистру
+                    newText?.let { it1 -> it.title.toLowerCase(Locale.getDefault()).contains(it1.toLowerCase(Locale.getDefault())) }!!
+                }
+                //Добавляем в адаптер
+                filmsAdapter.addItems(result)
+                return true
+            }
+        })
     }
+
 
 }
