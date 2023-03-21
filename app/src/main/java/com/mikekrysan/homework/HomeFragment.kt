@@ -1,12 +1,20 @@
 package com.mikekrysan.homework
 
 import android.os.Bundle
+import android.transition.Scene
+import android.transition.Slide
+import android.transition.TransitionManager
+import android.transition.TransitionSet
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_home.*
+import kotlinx.android.synthetic.main.merge_home_screen_content.*
+import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -26,6 +34,11 @@ class HomeFragment : Fragment() {
         Film("The lion king", R.drawable.the_lion_king, "Молодой принц-лев изгнан из своей гордыни своим жестоким дядей, который утверждает, что убил своего отца. Пока дядя правит железной лапой, принц растет за пределами Саванны, живя по философии: никаких забот до конца своих дней. Но когда прошлое начинает преследовать его, молодой принц должен решить свою судьбу: останется ли он изгоем или столкнется со своими демонами и станет тем, кем он должен быть?"),
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        retainInstance = true
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,8 +50,67 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        AnimationHelper.perfomFragmentCircularRevealAnimation(home_fragment_root, requireActivity(), 1)
+
+//        val scene = Scene.getSceneForLayout(home_fragment_root, R.layout.merge_home_screen_content, requireContext())
+//        //Создаем анимацию выезда поля поиска сверху
+//        val searchSlide = Slide(Gravity.TOP).addTarget(R.id.search_view)
+//        //Создаем анимацию выезда RV снизу
+//        val recyclerSlide = Slide(Gravity.BOTTOM).addTarget(R.id.main_recycler)
+//        //Создаем экземпляр TransitionSet, который объеденит все наши анимации
+//        val customTransition = TransitionSet().apply {
+//            //Устанавливаем время, за которое будет происходить анимация
+//            duration = 500
+//            //Добавляем сами анимации
+//            addTransition(recyclerSlide)
+//            addTransition(searchSlide)
+//        }
+//        //Также запускаем через TransitionManager, но вторым параметром передаем нашу кастомную анимацию
+//        TransitionManager.go(scene, customTransition)
+
+        initSearchView()
+        //Находим нашу БД в RV
+        initRecycler()
+        //Кладем нашу БД в RV //24.10 End
+        filmsAdapter.addItems(filmsDataBase)
+
+    }
+
+    private fun initSearchView() {
+        //Для того, чтобы выбиралось все поле поиска при нажатии на нем, а не только по иконке:
+        search_view_fh.setOnClickListener {
+            search_view_fh.isIconified = false
+        }
+
+        //Подключаем слушателя изменений введенного текста в поиска
+        search_view_fh.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            //Этот метод отрабатывает при нажатии кнопки "поиск" на софт клавиатуре
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return true
+            }
+            //Этот метод отрабатывает на каждое изменения текста
+            override fun onQueryTextChange(newText: String?): Boolean {
+                //Если ввод пуст то вставляем в адаптер всю БД
+                if (newText!!.isEmpty()) {
+                    filmsAdapter.addItems(filmsDataBase)
+                    return true
+                }
+                //Фильтруем список на поискк подходящих сочетаний
+                val result = filmsDataBase.filter {
+                    //Чтобы все работало правильно, нужно и запрос, и имя фильма приводить к нижнему регистру
+                    newText?.let { it1 -> it.title.toLowerCase(Locale.getDefault()).contains(it1.toLowerCase(Locale.getDefault())) }!!
+                }
+                //Добавляем в адаптер
+                filmsAdapter.addItems(result)
+                return true
+            }
+        })
+    }
+
+
+    private fun initRecycler() {
         //Находим наш RV //24.10Start
-        main_recycler.apply {
+        main_recycler_fh.apply {
             //Инициализируем наш адаптер в конструктор передаем анонимно инициализированный интерфейс,
             //оставим его пока пустым, он нам понадобится во второй части задания
             filmsAdapter = FilmListRecyclerAdapter(object : FilmListRecyclerAdapter.OnItemClickListener {
@@ -54,8 +126,7 @@ class HomeFragment : Fragment() {
             val decorator = TopSpacingItemDecoration(8)
             addItemDecoration(decorator)
         }
-        //Кладем нашу БД в RV //24.10 End
-        filmsAdapter.addItems(filmsDataBase)
     }
+
 
 }

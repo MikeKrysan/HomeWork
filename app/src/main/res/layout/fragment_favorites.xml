@@ -4,7 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".FavoritesFragment">
+    tools:context=".FavoritesFragment"
+    android:id="@+id/favorites_fragment_root"
+    android:visibility="invisible"
+    tools:visibility="visible"
+    android:background="@drawable/background_favorites">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/favorites_recycler"

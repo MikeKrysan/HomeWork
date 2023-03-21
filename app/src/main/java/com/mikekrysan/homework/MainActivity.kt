@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -19,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_main.*
  * 24.8 В MainActivity создадим поле для нашего адаптера на уровне класса
  * 24.9 Для отступов между элементами создадим класс TopSpacingItemDecoration
  * 24.10 Инициализируем RV в методе onCreate класса MainActivity
- * 24.11 создадим новое активити: DetailsActivity и заполним верстку activity_details.xml
+ * 24.11 создадим новое активити: DetailsActivity и заполним верстку activity_details.xmlF
  * 24.12 Доделаем обработку нажатий по элементам в RV, в методе click() и в адаптере onBindViewHolder() класса FilmListRecyclerAdapter
  * 24.13 Чтобы передавать объект в активити чтобы при откритии было видно постер, название фильма и описание, необходимо дата классу Film добавить аннотоцию @Parcelize
  *      и наследовать интерфейс Parcelable
@@ -69,24 +70,46 @@ class MainActivity : AppCompatActivity() {
         bottom_navigation.setOnNavigationItemSelectedListener {
 
             when (it.itemId) {
+                R.id.home -> {
+                    val tag = "home"
+                    val fragment = checkFragmentExistance(tag)
+                    //В первом параметре, если фрагмен не найден и метод вернул  null, то с помощью элвиса вызываем создание нового фрагмента
+                    changeFragment(fragment?: HomeFragment(), tag)
+                    true
+                }
                 R.id.favorites -> {
-                    supportFragmentManager
-                        .beginTransaction()
-                        .replace(R.id.fragment_placeholder, FavoritesFragment())
-                        .commit()
+                    val tag = "favorites"
+                    val fragment = checkFragmentExistance(tag)
+                    changeFragment(fragment?: FavoritesFragment(), tag)
                     true
                 }
                 R.id.watch_later -> {
-                    Toast.makeText(this, "Посмотреть позже", Toast.LENGTH_SHORT).show()
+                    val tag = "watch_later"
+                    val fragment = checkFragmentExistance(tag)
+                    changeFragment( fragment?: WatchLaterFragment(), tag)
                     true
                 }
                 R.id.selections -> {
-                    Toast.makeText(this, "Подборки", Toast.LENGTH_SHORT).show()
+                    val tag = "selection"
+                    val fragment = checkFragmentExistance(tag)
+                    changeFragment(fragment?: SelectionFragment(), tag)
                     true
                 }
                 else -> false
             }
         }
+    }
+
+    //Ищем фрагмент по тегу, если он есть, то возвращаем его, если нет, то null
+    private fun checkFragmentExistance(tag: String): Fragment? = supportFragmentManager.findFragmentByTag(tag)
+
+    //Cам запуск фрагмента
+    private fun changeFragment(fragment: Fragment, tag: String) {
+        supportFragmentManager
+            .beginTransaction()
+            .replace(R.id.fragment_placeholder, fragment, tag)
+            .addToBackStack(null)
+            .commit()
     }
 }
 
