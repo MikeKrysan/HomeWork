@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">HomeWork</string>
+    <string name="menu_home_title_text">Главный экран</string>
     <string name="menu_favorites_title">Избранные</string>
     <string name="menu_watch_later_title">Отложенные</string>
     <string name="menu_selections_title">Компиляция</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <!-- TODO: Remove or change this placeholder text -->
 </resources>
